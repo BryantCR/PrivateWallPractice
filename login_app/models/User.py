@@ -2,6 +2,7 @@ from login_app.config.MySQLConnection import connectToMySQL
 from login_app import app 
 from datetime import date, datetime
 from flask import flash
+import re
 
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
@@ -46,35 +47,23 @@ class User:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ############################################################################################################## STATIC METHOD
-    @staticmethod
-    def validate_user_password( data ):
-
-        isValid = True
-        if len( first_name ) < 5:
-            flash( "Username must be at least 5 characters long" )
-            isValid = False 
-        if len( last_name ) < 5:
-            flash( "Username must be at least 5 characters long" )
-            isValid = False
-        if len( email ) < 5:
-            flash( "Username must be at least 5 characters long" )
-            isValid = False 
-        if len( users_password ) < 8:
-            flash( "Password must be at least 8 characters long")
-            isValid = False
-        return isValid
+    # @staticmethod
+    # def validate_user_password( data ):
+    #     isValid = True
+    #     if len( first_name ) < 5:
+    #         flash( "Username must be at least 5 characters long" )
+    #         isValid = False 
+    #     if len( last_name ) < 5:
+    #         flash( "Username must be at least 5 characters long" )
+    #         isValid = False
+    #     if len( email ) < 5:
+    #         flash( "Username must be at least 5 characters long" )
+    #         isValid = False 
+    #     if len( users_password ) < 8:
+    #         flash( "Password must be at least 8 characters long")
+    #         isValid = False
+    #     return isValid
 
     @staticmethod
     def validate_login( data ):
@@ -82,13 +71,52 @@ class User:
         if not EMAIL_REGEX.match(data['email']): 
             flash("Invalid email address!", "login")
             is_valid = False
-        if len(data['pw']) < 8:
+        if len(data['users_password']) < 8:
             flash("Please enter a password. Passwords are at least 8 characters long", "login")
             is_valid = False
         return is_valid
 
 
+    @staticmethod
+    def validate_registration(data):
+        isValid = True
+        query = "SELECT * FROM users WHERE email = %(email)s;"
 
+        data2 = {
+            "first_name" : data[0],
+            "last_name" : data[1],
+            "email" : data[2],
+            "users_password" : data[3],
+            "encryptedpassword" : data[4],
+            "confirm_users_password" : data[5]
+        }
+        results = connectToMySQL('login_and_registration').query_db( query, data2 )
+
+        if len(results)>=1:
+            flash("Email already registered")
+            isValid = False
+
+        if len( data[0] ) < 2:
+            flash( "First name must be at least 2 characters long" )
+            isValid = False 
+
+        if len( data[1] ) < 2:
+            flash( "Last name must be at least 2 characters long")
+            isValid = False
+
+        if not EMAIL_REGEX.match(data[2]):
+            flash("Email Address must have a valid format, try with a new one please")
+            isValid = False
+
+        if len(data[3]) < 8:
+            flash("Password must be at least 8 characters long")
+            isValid = False
+
+        if data[3] != data[5]:
+            flash("Passwords must match, try again")
+            isValid = False
+        return isValid
+        
 
     # @classmethod
     # def get_all_users(cls):

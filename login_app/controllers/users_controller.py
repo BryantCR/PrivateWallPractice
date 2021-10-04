@@ -3,6 +3,7 @@ from login_app import app
 from login_app.models.User import User
 from flask_bcrypt import Bcrypt
 
+
 bcrypt = Bcrypt(app)
 
 @app.route( "/" ) #redirect allway to home
@@ -28,6 +29,7 @@ def registerUser():
     data = (first_name,last_name,email,users_password,encryptedpassword,confirm_users_password)
     print("FROM FORM 1 REGISTER: ", data )
     result  = User.register_login(data)
+    validateCorrectData = User.validate_registration(data)
     print("END OF REGISTER PART++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", data)
     return redirect('/login')
 
@@ -48,15 +50,16 @@ def privateWall():
     print("ROUTE /wall, privateWall in excecution*****************")
     return render_template( "privatewall.html")
 
+@app.route('/logout', methods=['POST'])
+def userlogout():
+    session.clear()
+    responseObj = {
+        'message' : 'logout successfully'
+    }
+    return responseObj
 
 
 
-
-# @app.route('/users/create', methods=['POST'])
-# def create():
-#     print(request.form)
-#     User.addDataForm(request.form)
-#     return redirect('/users')
 
 # #//////////////////////////////////////// EDIT PART ///////////////////////////////////////////
 # #Here we're trying to redirect to the next page
