@@ -3,7 +3,8 @@ from login_app import app
 from datetime import date, datetime
 from flask import flash
 
-#compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
 
 class User:
     def __init__(self, users_id, first_name, last_name, email, users_password, created_at):
@@ -36,8 +37,10 @@ class User:
             "users_password" : data[1],
         }
         result = connectToMySQL('login_and_registration').query_db( query, data2 )
-        return result
-
+        if len(result)<1:
+            return False
+        else:
+            return result
 
 
 
@@ -71,10 +74,18 @@ class User:
         if len( users_password ) < 8:
             flash( "Password must be at least 8 characters long")
             isValid = False
-        
         return isValid
 
-
+    @staticmethod
+    def validate_login( data ):
+        is_valid = True
+        if not EMAIL_REGEX.match(data['email']): 
+            flash("Invalid email address!", "login")
+            is_valid = False
+        if len(data['pw']) < 8:
+            flash("Please enter a password. Passwords are at least 8 characters long", "login")
+            is_valid = False
+        return is_valid
 
 
 
