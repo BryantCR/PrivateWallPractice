@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, session
 from login_app import app
 from login_app.models.User import User
 from flask_bcrypt import Bcrypt
@@ -48,7 +48,7 @@ def userlogin():
     print("END OF LOGIN PART++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", data)
     print("Result: ", result)
 
-    if len( result ) == 1:
+    if len( result ) > 0:
         encryptedPassword = result[0]['users_password']
         print(encryptedPassword)
         if bcrypt.check_password_hash( encryptedPassword, users_password ):
@@ -62,20 +62,23 @@ def userlogin():
     else:
         messageWrongPass = "There is no user with this information"
         session['ErrorMessage'] = messageWrongPass
-        return redirect('/login')
+    return redirect('/login')
 
 @app.route( "/wall", methods = ['GET'] )
 def privateWall():
     print("ROUTE /wall, privateWall in excecution*****************")
-    return render_template( "privatewall.html")
+    if 'users_id' not in session:
+        return redirect('/logout')
+    data ={
+        'users_id': session['users_id']
+    }
+    users = User.get_userBy_id(data)
+    return render_template( "privatewall.html", users = users)
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout')
 def userlogout():
     session.clear()
-    responseObj = {
-        'message' : 'logout successfully'
-    }
-    return responseObj
+    return redirect('/')
 
 
 

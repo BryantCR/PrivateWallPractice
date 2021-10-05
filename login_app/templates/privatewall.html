@@ -8,16 +8,18 @@
     </head>
     <body>
         <header>
-            <nav class="navbar navbar-expand-lg navbar-dark py-1 fixed-top">
-                <div class="container_tittle">
-                    <h2 href="#" class="navbar">
+            <nav class="navbar navbar-light bg-light ">
+                <div class="container-fluid">
+                    <h2 href="#" class="navbar-brand">
                         Coding Dojo Wall
                     </h2>
-                    <h4>
-                        Welcome, 
-                    </h4>
-                    <div>
-                        <a href="/">log out</a>
+                    <div class="">
+                        <h4 class="navbar-brand .mr-1">
+                            Welcome, {{users[0]['first_name']}}
+                        </h4>
+                        <div>
+                            <a href="/logout">log out</a>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -46,7 +48,7 @@
                 <h3 class="text-primary">
                     Send Messages
                 </h3>
-                
+
             </div>
         </main>
     </body>

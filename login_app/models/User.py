@@ -38,10 +38,14 @@ class User:
             "users_password" : data[1],
         }
         result = connectToMySQL('login_and_registration').query_db( query, data2 )
-        if len(result)<1:
-            return False
-        else:
-            return result
+        return result
+
+    @classmethod
+    def get_userBy_id( cls, data ):
+        query = "SELECT * FROM users WHERE users_id = %(users_id)s;"
+
+        results = connectToMySQL('login_and_registration').query_db( query, data )
+        return results
 
 
 
