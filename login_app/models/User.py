@@ -76,6 +76,15 @@ class User:
             is_valid = False
         return is_valid
 
+    @classmethod
+    def get_user_to_validate( cls, username ):
+        query = "SELECT * FROM users WHERE username=%(username)s;"
+        data = {
+            "username" : username
+        }
+        result = connectToMySQL( "login_and_registration" ).query_db( query, data )
+
+        return result
 
     @staticmethod
     def validate_registration(data):

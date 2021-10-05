@@ -28,10 +28,13 @@ def registerUser():
 
     data = (first_name,last_name,email,users_password,encryptedpassword,confirm_users_password)
     print("FROM FORM 1 REGISTER: ", data )
-    result  = User.register_login(data)
-    validateCorrectData = User.validate_registration(data)
     print("END OF REGISTER PART++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", data)
+    if User.validate_registration(data):
+        User.register_login(data)
+    else:
+        print("invalid values")
     return redirect('/login')
+
 
 @app.route('/login/user', methods = ['POST'] )#receive the data from DB and redirects to the private wall
 def userlogin():
@@ -43,7 +46,23 @@ def userlogin():
     print("FROM FORM 2 LOGIN: ", data )
     result  = User.user_login(data)
     print("END OF LOGIN PART++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", data)
-    return redirect('/wall')
+    print("Result: ", result)
+
+    if len( result ) == 1:
+        encryptedPassword = result[0]['users_password']
+        print(encryptedPassword)
+        if bcrypt.check_password_hash( encryptedPassword, users_password ):
+            session.clear()
+            users_id = result[0]['users_id']
+            session['users_id'] = users_id
+            return redirect ('/wall')
+        else:
+            messageWrongPass = "Wrong credentials provided."
+            session['ErrorMessage'] = messageWrongPass
+    else:
+        messageWrongPass = "There is no user with this information"
+        session['ErrorMessage'] = messageWrongPass
+        return redirect('/login')
 
 @app.route( "/wall", methods = ['GET'] )
 def privateWall():
